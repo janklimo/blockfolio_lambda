@@ -1,0 +1,19 @@
+{
+  "deploy_settings": {
+    "default": {
+      "skill_id": "amzn1.ask.skill.e32de1a7-6c49-4842-a156-fec4a1415bc8",
+      "was_cloned": false,
+      "merge": {
+        "skillManifest": {
+          "apis": {
+            "custom": {
+              "endpoint": {
+                "uri": "ask-BlockfolioSkill"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
