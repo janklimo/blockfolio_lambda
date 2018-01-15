@@ -138,7 +138,32 @@ describe('All intents', () => {
     });
 
     it('valid outputSpeech', () => {
-      expect(ctx.speechResponse.response.outputSpeech.ssml).to.match(/current balance/);
+      expect(ctx.speechResponse.response.outputSpeech.ssml)
+        .to.match(/current balance is \$28\,591\.54/);
+    });
+  });
+
+  describe('Blockfolio servers are down', () => {
+    before((done) => {
+      ctx.done = done;
+      sinon
+        .stub(request, 'get')
+        .yields('something terrible happened', {statusCode: 500}, "");
+
+      lambdaToTest.handler(event, ctx);
+    });
+
+    after(() => {
+      request.get.restore();
+    });
+
+    it('valid response', () => {
+      validRsp(ctx,{ endSession: true });
+    });
+
+    it('valid outputSpeech', () => {
+      expect(ctx.speechResponse.response.outputSpeech.ssml)
+        .to.match(/currently down/);
     });
   });
 });

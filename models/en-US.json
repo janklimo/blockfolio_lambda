@@ -22,7 +22,12 @@
           "samples":[
             "get my current balance",
             "what is my total balance",
-            "what's my balance"
+            "what's my balance",
+            "what is my balance",
+            "what's my portfolio value",
+            "what is my portfolio value",
+            "what's my current balance",
+            "what is my current balance"
           ]
         }
       ]

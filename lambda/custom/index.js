@@ -29,9 +29,19 @@ var handlers = {
   },
 
   'GetCurrentBalanceIntent' : function () {
-    const speechOutput = 'Your current balance is $1000.'
+    let speechOutput;
+
+    getBalance((err, body) => {
+      try {
+        const data = JSON.parse(body);
+        let balance = data.portfolio.portfolioValueFiat;
+        speechOutput = `Your current balance is ${balance}`;
+      } catch(e) {
+        speechOutput = 'I\'m sorry. Blockfolio servers are currently down.';
+      }
+    });
+
     this.response.speak(speechOutput);
-    getBalance((err, data) => console.log(data));
     this.emit(':responseReady');
   },
 
@@ -59,6 +69,6 @@ var handlers = {
 const getBalance = (callback) => {
   const url = "https://api-v0.blockfolio.com/rest/get_all_positions/00c9c473b297e87ceab1b8627a3e54b0898804eb4aa72da310c0d444c62d5a44";
   request.get(url, (error, response, body) => {
-    callback(error, JSON.parse(body));
+    callback(error, body);
   });
 }
