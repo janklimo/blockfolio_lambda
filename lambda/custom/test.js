@@ -124,7 +124,7 @@ describe('All intents', () => {
       // stub GET request
       sinon
         .stub(request, 'get')
-        .yields(null, null, JSON.stringify(balances));
+        .yields(null, { statusCode: 200 }, JSON.stringify(balances));
 
       lambdaToTest.handler(event, ctx);
     });
@@ -148,7 +148,7 @@ describe('All intents', () => {
       ctx.done = done;
       sinon
         .stub(request, 'get')
-        .yields('something terrible happened', {statusCode: 500}, "");
+        .yields('something terrible happened', { statusCode: 500 }, "");
 
       lambdaToTest.handler(event, ctx);
     });
