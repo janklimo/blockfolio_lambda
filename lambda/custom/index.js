@@ -36,13 +36,14 @@ var handlers = {
         const data = JSON.parse(body);
         let balance = data.portfolio.portfolioValueFiat;
         speechOutput = `Your current balance is ${balance}`;
+        this.response.speak(speechOutput);
+        this.emit(':responseReady');
       } catch(e) {
         speechOutput = 'I\'m sorry. Blockfolio servers are currently down.';
+        this.response.speak(speechOutput);
+        this.emit(':responseReady');
       }
     });
-
-    this.response.speak(speechOutput);
-    this.emit(':responseReady');
   },
 
   'AMAZON.StopIntent': function () {
