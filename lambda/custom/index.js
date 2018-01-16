@@ -33,8 +33,8 @@ var handlers = {
 
     getBalance().then((body) => {
       const data = JSON.parse(body);
-      let balance = data.portfolio.portfolioValueFiat;
-      speechOutput = `Your current balance is ${balance}`;
+      let balance = data.portfolio.fiatValue.toFixed();
+      speechOutput = `Your current balance is $${balance}.`;
       this.response.speak(speechOutput);
       this.emit(':responseReady');
     }).catch((err) => {

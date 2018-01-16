@@ -137,9 +137,9 @@ describe('All intents', () => {
       validRsp(ctx,{ endSession: true });
     });
 
-    it('valid outputSpeech', () => {
+    it('valid outputSpeech with rounded portfolio value', () => {
       expect(ctx.speechResponse.response.outputSpeech.ssml)
-        .to.match(/current balance is \$28\,591\.54/);
+        .to.match(/current balance is \$28592\./);
     });
   });
 
