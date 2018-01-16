@@ -1,7 +1,7 @@
 {
   "interactionModel":{
     "languageModel":{
-      "invocationName":"Blockfolio",
+      "invocationName":"blockfolio",
       "types":[],
       "intents":[
         {
@@ -20,14 +20,30 @@
           "name":"GetCurrentBalanceIntent",
           "slots":[],
           "samples":[
+            "my balance",
+            "my current balance",
             "get my current balance",
             "what is my total balance",
             "what's my balance",
             "what is my balance",
+            "my portfolio value",
             "what's my portfolio value",
             "what is my portfolio value",
             "what's my current balance",
             "what is my current balance"
+          ]
+        },
+        {
+          "name":"GetDailyProfitIntent",
+          "slots":[],
+          "samples":[
+            "get my today's profit",
+            "how much money I made today",
+            "how much profit I made today",
+            "what's my today's profit",
+            "what is my today's profit",
+            "what's my daily profit",
+            "what is my daily profit"
           ]
         }
       ]
