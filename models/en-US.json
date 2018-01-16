@@ -1,7 +1,7 @@
 {
   "interactionModel":{
     "languageModel":{
-      "invocationName":"blockfolio",
+      "invocationName":"Blockfolio",
       "types":[],
       "intents":[
         {
