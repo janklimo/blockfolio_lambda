@@ -3,6 +3,7 @@
 let expect = require('chai').expect;
 let lambdaToTest = require('./index');
 let balances = require('../fixtures/balances.json');
+let profitableDayData = require('../fixtures/profitable_day.json');
 const sinon = require('sinon');
 const request = require('request');
 
@@ -140,6 +141,68 @@ describe('All intents', () => {
     it('valid outputSpeech with rounded portfolio value', () => {
       expect(ctx.speechResponse.response.outputSpeech.ssml)
         .to.match(/current balance is \$28592\./);
+    });
+  });
+
+  describe('Test GetCurrentBalanceIntent', () => {
+    describe('Profitable day', () => {
+      before((done) => {
+        event.request.intent = {};
+        event.session.attributes = {};
+        event.request.type = 'IntentRequest';
+        event.request.intent.name = 'GetDailyProfitIntent';
+        ctx.done = done;
+
+        // stub GET request
+        sinon
+          .stub(request, 'get')
+          .yields(null, { statusCode: 200 }, JSON.stringify(profitableDayData));
+
+        lambdaToTest.handler(event, ctx);
+      });
+
+      after(() => {
+        request.get.restore();
+      });
+
+      it('valid response', () => {
+        validRsp(ctx,{ endSession: true });
+      });
+
+      it('valid outputSpeech with rounded profit value', () => {
+        expect(ctx.speechResponse.response.outputSpeech.ssml)
+        .to.match(/Today you made \$123456\./);
+      });
+    });
+
+    describe('A bad day', () => {
+      before((done) => {
+        event.request.intent = {};
+        event.session.attributes = {};
+        event.request.type = 'IntentRequest';
+        event.request.intent.name = 'GetDailyProfitIntent';
+        ctx.done = done;
+
+        // stub GET request
+        sinon
+          .stub(request, 'get')
+          .yields(null, { statusCode: 200 }, JSON.stringify(balances));
+
+        lambdaToTest.handler(event, ctx);
+      });
+
+      after(() => {
+        request.get.restore();
+      });
+
+      it('valid response', () => {
+        validRsp(ctx,{ endSession: true });
+      });
+
+      it('valid outputSpeech with rounded loss value', () => {
+        expect(ctx.speechResponse.response.outputSpeech.ssml)
+        .to.match(/Today you lost \$548\./);
+      });
     });
   });
 

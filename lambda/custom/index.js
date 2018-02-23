@@ -44,6 +44,28 @@ var handlers = {
     });
   },
 
+  'GetDailyProfitIntent' : function () {
+    let speechOutput;
+
+    getBalance().then((body) => {
+      const data = JSON.parse(body);
+      let profit = data.portfolio.twentyFourHourChangeFiat.toFixed();
+
+      if (profit >= 0) {
+        speechOutput = `Today you made $${profit}.`;
+      } else {
+        speechOutput = `Today you lost $${Math.abs(profit)}.`;
+      }
+
+      this.response.speak(speechOutput);
+      this.emit(':responseReady');
+    }).catch((err) => {
+      speechOutput = 'I\'m sorry. Blockfolio servers are currently down.';
+      this.response.speak(speechOutput);
+      this.emit(':responseReady');
+    });
+  },
+
   'AMAZON.StopIntent': function () {
     this.response.speak(STOP_MESSAGE);
     this.emit(':responseReady');
