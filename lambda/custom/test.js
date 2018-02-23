@@ -171,7 +171,7 @@ describe('All intents', () => {
 
       it('valid outputSpeech with rounded profit value', () => {
         expect(ctx.speechResponse.response.outputSpeech.ssml)
-        .to.match(/Today you made \$123456\./);
+        .to.match(/Today you made \$9269\./);
       });
     });
 

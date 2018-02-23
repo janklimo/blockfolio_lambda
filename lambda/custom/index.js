@@ -49,12 +49,16 @@ var handlers = {
 
     getBalance().then((body) => {
       const data = JSON.parse(body);
-      let profit = data.portfolio.twentyFourHourChangeFiat.toFixed();
+      const direction = data.portfolio.arrowFiat;
+      const changeFiat = data.portfolio.changeFiat;
+      const change = Number(changeFiat.slice(1).replace(/[^0-9\.-]+/g, "")).toFixed();
 
-      if (profit >= 0) {
-        speechOutput = `Today you made $${profit}.`;
+      // "changeFiat": "+$9,269.20"
+      // twentyFourHourChangeFiat returns 0 occasionally so we need to use this
+      if (direction === 'up') {
+        speechOutput = `Today you made $${change}.`;
       } else {
-        speechOutput = `Today you lost $${Math.abs(profit)}.`;
+        speechOutput = `Today you lost $${change}.`;
       }
 
       this.response.speak(speechOutput);
