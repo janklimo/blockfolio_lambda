@@ -8,12 +8,20 @@
             "Alexa ask Blockfolio how much I made today",
             "Alexa ask Blockfolio what's my current balance"
           ],
+          "keywords": [
+            "Blockfolio",
+            "Bitcoin",
+            "Crypto",
+            "Cryptocurrencies"
+          ],
           "name": "Blockfolio",
-          "description": "Ask Blockfolio about your current balances"
+          "description": "Ask Blockfolio about your current balances",
+          "smallIconUri": "https://s3-us-west-2.amazonaws.com/blockfolio/bf_108.png",
+          "largeIconUri": "https://s3-us-west-2.amazonaws.com/blockfolio/bf_512.png"
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Run npm test.",
+      "testingInstructions": "1) Say 'Alexa, open Blockfolio'",
       "category": "EDUCATION_AND_REFERENCE",
       "distributionCountries": []
     },
@@ -21,6 +29,18 @@
       "custom": {
         "endpoint": {
           "sourceDir": "lambda/custom"
+        }
+      }
+    },
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "https://blockfolio-server.herokuapp.com/privacy"
         }
       }
     },
