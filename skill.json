@@ -3,9 +3,9 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Blockfolio balances skill",
+          "summary": "Blockfolio skill for Alexa",
           "examplePhrases": [
-            "Alexa open Blockfolio",
+            "Alexa ask Blockfolio how much I made today",
             "Alexa ask Blockfolio what's my current balance"
           ],
           "name": "Blockfolio",
@@ -13,7 +13,7 @@
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "Sample Testing Instructions.",
+      "testingInstructions": "Run npm test.",
       "category": "EDUCATION_AND_REFERENCE",
       "distributionCountries": []
     },

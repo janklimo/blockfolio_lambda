@@ -20,8 +20,17 @@ exports.handler = function(event, context, callback) {
 
 var handlers = {
   'LaunchRequest': function () {
-    this.response.speak(WELCOME_MESSAGE).listen(WELCOME_REPROMPT);
-    this.emit(':responseReady');
+    const accessToken = this.event.session.user.accessToken;
+    if (accessToken !== undefined) {
+      this.response.speak(WELCOME_MESSAGE).listen(WELCOME_REPROMPT);
+      this.emit(':responseReady');
+    } else {
+      this.emit(
+        ':tellWithLinkAccountCard',
+        'Welcome to Blockfolio! Please link your account to use this Skill.' +
+          ' I\'ve sent the details to your Alexa App.'
+      );
+    }
   },
 
   'SessionEndedRequest' : function() {

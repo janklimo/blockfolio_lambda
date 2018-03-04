@@ -30,6 +30,35 @@ let event = {
     sessionId: 'session1234',
     attributes: {},
     user: {
+      userId: 'usrid123',
+      accessToken: 'alegittoken1234'
+    },
+    application: {
+      applicationId: 'amzn1.ask.skill.e32de1a7-6c49-4842-a156-fec4a1415bc8'
+    }
+  },
+  version: '1.0',
+  request: {
+    intent: {
+      slots: {
+        SlotName: {
+          name: 'SlotName',
+          value: 'slot value'
+        }
+      },
+      name: 'intent name'
+    },
+    type: 'IntentRequest',
+    requestId: 'request5678'
+  }
+};
+
+let eventWithoutToken = {
+  session: {
+    new: false,
+    sessionId: 'session1234',
+    attributes: {},
+    user: {
       userId: 'usrid123'
     },
     application: {
@@ -52,6 +81,7 @@ let event = {
   }
 };
 
+
 const validRsp = (ctx, options) => {
   expect(ctx.speechError).to.be.null;
   expect(ctx.speechResponse.version).to.be.equal('1.0');
@@ -72,19 +102,22 @@ const validRsp = (ctx, options) => {
   }
 }
 
-const validCard = (ctx, standardCard) => {
+const validCard = (ctx, type) => {
   expect(ctx.speechResponse.response.card).not.to.be.undefined;
-  expect(ctx.speechResponse.response.card.title).not.to.be.undefined;
 
-  if (standardCard) {
+  if (type === 'Standard') {
+    expect(ctx.speechResponse.response.card.title).not.to.be.undefined;
     expect(ctx.speechResponse.response.card.type).to.be.equal('Standard');
     expect(ctx.speechResponse.response.card.text).not.to.be.undefined;
     expect(ctx.speechResponse.response.card.image).not.to.be.undefined;
     expect(ctx.speechResponse.response.card.image.largeImageUrl).to.match(/^https:\/\//);
     expect(ctx.speechResponse.response.card.image.smallImageUrl).to.match(/^https:\/\//);
-  } else {
+  } else if (type === 'Simple') {
+    expect(ctx.speechResponse.response.card.title).not.to.be.undefined;
     expect(ctx.speechResponse.response.card.type).to.be.equal('Simple');
     expect(ctx.speechResponse.response.card.content).not.to.be.undefined;
+  } else if (type === 'LinkAccount') {
+    expect(ctx.speechResponse.response.card.type).to.be.equal('LinkAccount');
   }
 }
 
@@ -92,25 +125,49 @@ describe('All intents', () => {
   let ctx = new Context();
 
   describe('Test LaunchIntent', () => {
-    before((done) => {
-      event.request.type = 'LaunchRequest';
-      event.request.intent = {};
-      event.session.attributes = {};
-      ctx.done = done;
-      lambdaToTest.handler(event, ctx);
-    });
+    describe('with a valid token', function(){
+      before((done) => {
+        event.request.type = 'LaunchRequest';
+        event.request.intent = {};
+        event.session.attributes = {};
+        ctx.done = done;
+        lambdaToTest.handler(event, ctx);
+      });
 
-    it('valid response', () => {
-      validRsp(ctx,{ endSession: false });
-    });
+      it('valid response', () => {
+        validRsp(ctx,{ endSession: false });
+      });
 
-    it('valid outputSpeech', () => {
-      expect(ctx.speechResponse.response.outputSpeech.ssml).to.match(/Welcome/);
-    });
+      it('valid outputSpeech', () => {
+        expect(ctx.speechResponse.response.outputSpeech.ssml).to.match(/Welcome/);
+      });
 
-    it('valid repromptSpeech', () => {
-      expect(ctx.speechResponse.response.reprompt.outputSpeech.ssml)
+      it('valid repromptSpeech', () => {
+        expect(ctx.speechResponse.response.reprompt.outputSpeech.ssml)
         .to.match(/You can say what's my balance/);
+      });
+    });
+
+    describe('when the account is not linked', function(){
+      before((done) => {
+        eventWithoutToken.request.type = 'LaunchRequest';
+        eventWithoutToken.request.intent = {};
+        eventWithoutToken.session.attributes = {};
+        ctx.done = done;
+        lambdaToTest.handler(eventWithoutToken, ctx);
+      });
+
+      it('valid response', () => {
+        validRsp(ctx,{ endSession: true });
+      });
+
+      it('valid outputSpeech', () => {
+        expect(ctx.speechResponse.response.outputSpeech.ssml).to.match(/Please link/);
+      });
+
+      it('prompts the user with a LinkAccount card', function() {
+        validCard(ctx, 'LinkAccount');
+      });
     });
   });
 
