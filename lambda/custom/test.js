@@ -144,7 +144,7 @@ describe('All intents', () => {
     });
   });
 
-  describe('Test GetCurrentBalanceIntent', () => {
+  describe('Test GetDailyProfitIntent', () => {
     describe('Profitable day', () => {
       before((done) => {
         event.request.intent = {};
@@ -171,7 +171,7 @@ describe('All intents', () => {
 
       it('valid outputSpeech with rounded profit value', () => {
         expect(ctx.speechResponse.response.outputSpeech.ssml)
-        .to.match(/Today you made \$9269\./);
+          .to.match(/Today you made \$9269\./);
       });
     });
 
@@ -201,7 +201,7 @@ describe('All intents', () => {
 
       it('valid outputSpeech with rounded loss value', () => {
         expect(ctx.speechResponse.response.outputSpeech.ssml)
-        .to.match(/Today you lost \$548\./);
+          .to.match(/Today you lost \$548\./);
       });
     });
   });

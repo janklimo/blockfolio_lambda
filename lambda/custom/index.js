@@ -38,9 +38,7 @@ var handlers = {
       this.response.speak(speechOutput);
       this.emit(':responseReady');
     }).catch((err) => {
-      speechOutput = 'I\'m sorry. Blockfolio servers are currently down.';
-      this.response.speak(speechOutput);
-      this.emit(':responseReady');
+      handleServersDown(this);
     });
   },
 
@@ -49,24 +47,18 @@ var handlers = {
 
     getBalance().then((body) => {
       const data = JSON.parse(body);
-      const direction = data.portfolio.arrowFiat;
-      const changeFiat = data.portfolio.changeFiat;
-      const change = Number(changeFiat.slice(1).replace(/[^0-9\.-]+/g, "")).toFixed();
+      const profit = data.portfolio.twentyFourHourChangeFiat.toFixed();
 
-      // "changeFiat": "+$9,269.20"
-      // twentyFourHourChangeFiat returns 0 occasionally so we need to use this
-      if (direction === 'up') {
-        speechOutput = `Today you made $${change}.`;
+      if (profit >= 0) {
+        speechOutput = `Today you made $${profit}.`;
       } else {
-        speechOutput = `Today you lost $${change}.`;
+        speechOutput = `Today you lost $${Math.abs(profit)}.`;
       }
 
       this.response.speak(speechOutput);
       this.emit(':responseReady');
     }).catch((err) => {
-      speechOutput = 'I\'m sorry. Blockfolio servers are currently down.';
-      this.response.speak(speechOutput);
-      this.emit(':responseReady');
+      handleServersDown(this);
     });
   },
 
@@ -103,4 +95,10 @@ const getBalance = () => {
       }
     });
   });
+}
+
+const handleServersDown = (self) => {
+  let speechOutput = 'I\'m sorry. Blockfolio servers are currently down.';
+  self.response.speak(speechOutput);
+  self.emit(':responseReady');
 }
