@@ -147,11 +147,11 @@ describe('All intents', () => {
 
       it('valid repromptSpeech', () => {
         expect(ctx.speechResponse.response.reprompt.outputSpeech.ssml)
-        .to.match(/You can say what's my balance/);
+        .to.match(/Try asking \"What\'s my balance\?\"/);
       });
 
       it('emits the right card', function() {
-        validCard(ctx, 'Standard', /Welcome.*\nYou can say/);
+        validCard(ctx, 'Standard', /Welcome.*\nTry asking \"What\'s/);
       });
     });
 

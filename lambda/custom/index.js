@@ -5,8 +5,8 @@ const request = require('request');
 const APP_ID = "amzn1.ask.skill.e32de1a7-6c49-4842-a156-fec4a1415bc8";
 
 const WELCOME_MESSAGE = 'Welcome to Blockfolio! Ask me about your crypto balances.';
-const WELCOME_REPROMPT = 'You can say what\'s my balance.';
-const HELP_MESSAGE = 'You can say what\'s my balance, or, you can say exit... What can I help you with?';
+const WELCOME_REPROMPT = "Try asking \"What\'s my balance?\" or \"How much did I make today?\".";
+const HELP_MESSAGE = "You can try asking \"What\'s my balance\", or you can say exit... What can I help you with?";
 const HELP_REPROMPT = 'What can I help you with?';
 const STOP_MESSAGE = 'Goodbye!';
 
