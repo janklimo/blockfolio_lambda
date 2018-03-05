@@ -102,7 +102,7 @@ const validRsp = (ctx, options) => {
   }
 }
 
-const validCard = (ctx, type) => {
+const validCard = (ctx, type, pattern) => {
   expect(ctx.speechResponse.response.card).not.to.be.undefined;
 
   if (type === 'Standard') {
@@ -110,8 +110,11 @@ const validCard = (ctx, type) => {
     expect(ctx.speechResponse.response.card.type).to.be.equal('Standard');
     expect(ctx.speechResponse.response.card.text).not.to.be.undefined;
     expect(ctx.speechResponse.response.card.image).not.to.be.undefined;
-    expect(ctx.speechResponse.response.card.image.largeImageUrl).to.match(/^https:\/\//);
-    expect(ctx.speechResponse.response.card.image.smallImageUrl).to.match(/^https:\/\//);
+    expect(ctx.speechResponse.response.card.image.smallImageUrl).to
+      .equal('https://s3-us-west-2.amazonaws.com/blockfolio/bf_108.png')
+    expect(ctx.speechResponse.response.card.image.largeImageUrl).to
+      .equal('https://s3-us-west-2.amazonaws.com/blockfolio/bf_512.png')
+    expect(ctx.speechResponse.response.card.text).to.match(pattern);
   } else if (type === 'Simple') {
     expect(ctx.speechResponse.response.card.title).not.to.be.undefined;
     expect(ctx.speechResponse.response.card.type).to.be.equal('Simple');
@@ -145,6 +148,10 @@ describe('All intents', () => {
       it('valid repromptSpeech', () => {
         expect(ctx.speechResponse.response.reprompt.outputSpeech.ssml)
         .to.match(/You can say what's my balance/);
+      });
+
+      it('emits the right card', function() {
+        validCard(ctx, 'Standard', /Welcome.*\nYou can say/);
       });
     });
 

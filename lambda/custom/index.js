@@ -22,8 +22,8 @@ var handlers = {
   'LaunchRequest': function () {
     const accessToken = this.event.session.user.accessToken;
     if (accessToken !== undefined) {
-      this.response.speak(WELCOME_MESSAGE).listen(WELCOME_REPROMPT);
-      this.emit(':responseReady');
+      this.emit(':askWithCard', WELCOME_MESSAGE, WELCOME_REPROMPT, 'Welcome',
+                `${WELCOME_MESSAGE}\n${WELCOME_REPROMPT}`, imageObject);
     } else {
       this.emit(
         ':tellWithLinkAccountCard',
@@ -110,4 +110,9 @@ const handleServersDown = (self) => {
   let speechOutput = 'I\'m sorry. Blockfolio servers are currently down.';
   self.response.speak(speechOutput);
   self.emit(':responseReady');
+}
+
+const imageObject = {
+  smallImageUrl: "https://s3-us-west-2.amazonaws.com/blockfolio/bf_108.png",
+  largeImageUrl: "https://s3-us-west-2.amazonaws.com/blockfolio/bf_512.png"
 }
