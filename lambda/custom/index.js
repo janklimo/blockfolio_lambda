@@ -9,7 +9,8 @@ const WELCOME_REPROMPT = "Try asking \"What\'s my balance?\" or \"How much did I
 const HELP_MESSAGE = "You can try asking \"What\'s my balance\", or you can say exit... What can I help you with?";
 const HELP_REPROMPT = 'What can I help you with?';
 const STOP_MESSAGE = 'Goodbye!';
-
+const LINKING_PROMPT = 'Welcome to Blockfolio! Please link your account ' +
+  'to use this Skill. I\'ve sent the details to your Alexa App.'
 
 exports.handler = function(event, context, callback) {
   var alexa = Alexa.handler(event, context);
@@ -25,11 +26,7 @@ var handlers = {
       this.emit(':askWithCard', WELCOME_MESSAGE, WELCOME_REPROMPT, 'Welcome',
                 `${WELCOME_MESSAGE}\n${WELCOME_REPROMPT}`, imageObject);
     } else {
-      this.emit(
-        ':tellWithLinkAccountCard',
-        'Welcome to Blockfolio! Please link your account to use this Skill.' +
-          ' I\'ve sent the details to your Alexa App.'
-      );
+      this.emit(':tellWithLinkAccountCard', LINKING_PROMPT);
     }
   },
 
@@ -39,6 +36,12 @@ var handlers = {
 
   'GetCurrentBalanceIntent' : function () {
     let speechOutput;
+
+    const accessToken = this.event.session.user.accessToken;
+    if (accessToken === undefined) {
+      this.emit(':tellWithLinkAccountCard', LINKING_PROMPT);
+      return;
+    }
 
     getBalance().then((body) => {
       const data = JSON.parse(body);
@@ -88,7 +91,7 @@ var handlers = {
 
   'Unhandled' : function() {
     this.response.speak("Sorry, I didn't get that. You can try: " +
-                        "'Alexa, what's my current balance'");
+                        "'Alexa, ask Blockfolio what's my current balance'");
   }
 };
 

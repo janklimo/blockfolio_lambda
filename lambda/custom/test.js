@@ -169,7 +169,8 @@ describe('All intents', () => {
       });
 
       it('valid outputSpeech', () => {
-        expect(ctx.speechResponse.response.outputSpeech.ssml).to.match(/Please link/);
+        expect(ctx.speechResponse.response.outputSpeech.ssml).to
+          .match(/Please link.*I\'ve sent/);
       });
 
       it('prompts the user with a LinkAccount card', function() {
