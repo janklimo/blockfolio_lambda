@@ -1,7 +1,6 @@
 'use strict';
 
 const Alexa = require('alexa-sdk');
-const axios = require('axios');
 const API = require('./api.js');
 
 const APP_ID = "amzn1.ask.skill.e32de1a7-6c49-4842-a156-fec4a1415bc8";
