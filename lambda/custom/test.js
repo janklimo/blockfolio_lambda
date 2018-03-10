@@ -4,6 +4,7 @@ let expect = require('chai').expect;
 let lambdaToTest = require('./index');
 let balances = require('../fixtures/balances.json');
 let profitableDayData = require('../fixtures/profitable_day.json');
+let tokenResponse = require('../fixtures/token.json');
 const moxios = require('moxios');
 
 class Context {
@@ -127,31 +128,19 @@ const validCard = (ctx, type, pattern) => {
   }
 }
 
-const stubAndReturn = (data) => {
+const stubAndReturn = (data, status) => {
   moxios.install()
 
   moxios.stubRequest("https://blockfolio-server.herokuapp.com/api/v1/credentials/me", {
     status: 200,
-    responseText: '1234'
+    responseText: tokenResponse
   });
 
-  moxios.stubRequest('https://api-v0.blockfolio.com/rest/get_all_positions/1234', {
-    status: 200,
+  const blockfolioToken = tokenResponse.data.attributes.blockfolio_token;
+
+  moxios.stubRequest(`https://api-v0.blockfolio.com/rest/get_all_positions/${blockfolioToken}`, {
+    status: status,
     responseText: data
-  });
-}
-
-const stubAndThrow = () => {
-  moxios.install()
-
-  moxios.stubRequest("https://blockfolio-server.herokuapp.com/api/v1/credentials/me", {
-    status: 200,
-    responseText: '1234'
-  });
-
-  moxios.stubRequest('https://api-v0.blockfolio.com/rest/get_all_positions/1234', {
-    status: 503,
-    responseText: 'dummy'
   });
 }
 
@@ -221,7 +210,7 @@ describe('All intents', () => {
       event.request.type = 'IntentRequest';
       event.request.intent.name = 'GetCurrentBalanceIntent';
       ctx.done = done;
-      stubAndReturn(balances)
+      stubAndReturn(balances, 200)
       lambdaToTest.handler(event, ctx);
     });
 
@@ -249,7 +238,7 @@ describe('All intents', () => {
         event.request.type = 'IntentRequest';
         event.request.intent.name = 'GetDailyProfitIntent';
         ctx.done = done;
-        stubAndReturn(profitableDayData)
+        stubAndReturn(profitableDayData, 200)
         lambdaToTest.handler(event, ctx);
       });
 
@@ -276,7 +265,7 @@ describe('All intents', () => {
         event.request.type = 'IntentRequest';
         event.request.intent.name = 'GetDailyProfitIntent';
         ctx.done = done;
-        stubAndReturn(balances)
+        stubAndReturn(balances, 200)
         lambdaToTest.handler(event, ctx);
       });
 
@@ -304,7 +293,7 @@ describe('All intents', () => {
       event.request.type = 'IntentRequest';
       event.request.intent.name = 'GetDailyProfitIntent';
       ctx.done = done
-      stubAndThrow()
+      stubAndReturn('dummy', 503)
       lambdaToTest.handler(event, ctx)
     });
 

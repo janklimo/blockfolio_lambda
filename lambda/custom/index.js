@@ -2,6 +2,7 @@
 
 const Alexa = require('alexa-sdk');
 const axios = require('axios');
+const API = require('./api.js');
 
 const APP_ID = "amzn1.ask.skill.e32de1a7-6c49-4842-a156-fec4a1415bc8";
 
@@ -44,14 +45,15 @@ var handlers = {
       return;
     }
 
-    getBalance(bearerToken).then(data => {
-      let balance = data.portfolio.fiatValue.toFixed();
+    API.getToken(bearerToken).then(blockfolioToken => {
+      return API.getBalance(blockfolioToken)
+    }).then(balance => {
       speechOutput = `Your current balance is $${balance}.`;
       this.response.speak(speechOutput);
       this.emit(':responseReady');
-    }).catch((err) => {
+    }).catch(err => {
       handleServersDown(this);
-    });
+    })
   },
 
   'GetDailyProfitIntent' : function () {
@@ -63,9 +65,9 @@ var handlers = {
       return;
     }
 
-    getBalance(bearerToken).then(data => {
-      const profit = data.portfolio.twentyFourHourChangeFiat.toFixed();
-
+    API.getToken(bearerToken).then(blockfolioToken => {
+      return API.getDailyProfit(blockfolioToken)
+    }).then(profit => {
       if (profit >= 0) {
         speechOutput = `Today you made $${profit}.`;
       } else {
@@ -76,7 +78,7 @@ var handlers = {
       this.emit(':responseReady');
     }).catch(err => {
       handleServersDown(this);
-    });
+    })
   },
 
   'AMAZON.StopIntent': function () {
@@ -109,36 +111,4 @@ const handleServersDown = (self) => {
 const imageObject = {
   smallImageUrl: "https://s3-us-west-2.amazonaws.com/blockfolio/bf_108.png",
   largeImageUrl: "https://s3-us-west-2.amazonaws.com/blockfolio/bf_512.png"
-}
-
-const getBalance = (bearerToken) => {
-  return getToken(bearerToken).then(body => {
-    const url = `https://api-v0.blockfolio.com/rest/get_all_positions/${body}`;
-
-    return new Promise((resolve, reject) => {
-      axios.get(url)
-        .then(response => {
-          resolve(response.data);
-        })
-        .catch(error => {
-          reject(error.response.status);
-        });
-    });
-  }).catch(err => {
-    reject(err)
-  });
-};
-
-const getToken = (bearerToken) => {
-  const url = "https://blockfolio-server.herokuapp.com/api/v1/credentials/me";
-
-  return new Promise((resolve, reject) => {
-    axios.get(url, { headers: { 'Authorization': 'Bearer WOOOOOAH' } })
-      .then(response => {
-        resolve(response.data);
-      })
-      .catch(error => {
-        reject(error.response.status);
-      });
-  });
 }

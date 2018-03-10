@@ -1,6 +1,8 @@
+'use strict';
+
 const axios = require('axios');
 
-const getToken = (bearerToken) => {
+exports.getToken = (bearerToken) => {
   const url = "https://blockfolio-server.herokuapp.com/api/v1/credentials/me";
 
   return new Promise((resolve, reject) => {
@@ -14,7 +16,7 @@ const getToken = (bearerToken) => {
   });
 }
 
-const getBalance = (blockfolioToken) => {
+exports.getBalance = (blockfolioToken) => {
   const url = `https://api-v0.blockfolio.com/rest/get_all_positions/${blockfolioToken}`;
 
   return new Promise((resolve, reject) => {
@@ -28,7 +30,7 @@ const getBalance = (blockfolioToken) => {
   });
 }
 
-const getDailyProfit = (blockfolioToken) => {
+exports.getDailyProfit = (blockfolioToken) => {
   const url = `https://api-v0.blockfolio.com/rest/get_all_positions/${blockfolioToken}`;
 
   return new Promise((resolve, reject) => {
@@ -41,15 +43,3 @@ const getDailyProfit = (blockfolioToken) => {
       });
   });
 }
-
-let timeBeginning;
-const token = "ba89d4b34d5d44f2149ed6475ad6d9c1a4a3232eb9e6bf290c8b2064a7a4d5a7"
-
-getToken(token).then(blockfolioToken => {
-  // getBalance(blockfolioToken)
-  return getDailyProfit(blockfolioToken)
-}).then(balance => {
-  console.log(balance);
-}).catch(err => {
-  console.log(err);
-})
