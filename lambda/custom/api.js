@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 
-exports.getToken = (bearerToken) => {
+const getBlockfolioToken = bearerToken => {
   const url = "https://blockfolio-server.herokuapp.com/api/v1/credentials/me";
 
   return new Promise((resolve, reject) => {
@@ -16,30 +16,33 @@ exports.getToken = (bearerToken) => {
   });
 }
 
-exports.getBalance = (blockfolioToken) => {
-  const url = `https://api-v0.blockfolio.com/rest/get_all_positions/${blockfolioToken}`;
+exports.getBalance = bearerToken => {
+  return getBlockfolioToken(bearerToken).then(blockfolioToken => {
+    const url = `https://api-v0.blockfolio.com/rest/get_all_positions/${blockfolioToken}`;
 
-  return new Promise((resolve, reject) => {
-    axios.get(url)
-      .then(response => {
-        resolve(response.data.portfolio.fiatValue.toFixed());
-      })
-      .catch(error => {
-        reject(error.response.status);
-      });
+    return new Promise((resolve, reject) => {
+      axios.get(url)
+        .then(response => {
+          resolve(response.data.portfolio.fiatValue.toFixed());
+        }).catch(error => {
+          reject(error.response.status);
+        });
+    });
   });
 }
 
-exports.getDailyProfit = (blockfolioToken) => {
-  const url = `https://api-v0.blockfolio.com/rest/get_all_positions/${blockfolioToken}`;
+exports.getDailyProfit = bearerToken => {
+  return getBlockfolioToken(bearerToken).then(blockfolioToken => {
+    const url = `https://api-v0.blockfolio.com/rest/get_all_positions/${blockfolioToken}`;
 
-  return new Promise((resolve, reject) => {
-    axios.get(url)
-      .then(response => {
-        resolve(response.data.portfolio.twentyFourHourChangeFiat.toFixed());
-      })
-      .catch(error => {
-        reject(error.response.status);
-      });
+    return new Promise((resolve, reject) => {
+      axios.get(url)
+        .then(response => {
+          resolve(response.data.portfolio.twentyFourHourChangeFiat.toFixed());
+        })
+        .catch(error => {
+          reject(error.response.status);
+        });
+    });
   });
 }

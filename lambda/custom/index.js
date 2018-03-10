@@ -45,9 +45,7 @@ var handlers = {
       return;
     }
 
-    API.getToken(bearerToken).then(blockfolioToken => {
-      return API.getBalance(blockfolioToken)
-    }).then(balance => {
+    API.getBalance(bearerToken).then(balance => {
       speechOutput = `Your current balance is $${balance}.`;
       this.response.speak(speechOutput);
       this.emit(':responseReady');
@@ -65,9 +63,7 @@ var handlers = {
       return;
     }
 
-    API.getToken(bearerToken).then(blockfolioToken => {
-      return API.getDailyProfit(blockfolioToken)
-    }).then(profit => {
+    API.getDailyProfit(bearerToken).then(profit => {
       if (profit >= 0) {
         speechOutput = `Today you made $${profit}.`;
       } else {
