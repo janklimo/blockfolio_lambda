@@ -4,8 +4,7 @@ let expect = require('chai').expect;
 let lambdaToTest = require('./index');
 let balances = require('../fixtures/balances.json');
 let profitableDayData = require('../fixtures/profitable_day.json');
-const sinon = require('sinon');
-const request = require('request');
+const moxios = require('moxios');
 
 class Context {
   constructor() {
@@ -105,6 +104,10 @@ const validRsp = (ctx, options) => {
 const validCard = (ctx, type, pattern) => {
   expect(ctx.speechResponse.response.card).not.to.be.undefined;
 
+  afterEach(() => {
+    moxios.uninstall()
+  });
+
   if (type === 'Standard') {
     expect(ctx.speechResponse.response.card.title).not.to.be.undefined;
     expect(ctx.speechResponse.response.card.type).to.be.equal('Standard');
@@ -124,8 +127,40 @@ const validCard = (ctx, type, pattern) => {
   }
 }
 
+const stubAndReturn = (data) => {
+  moxios.install()
+
+  moxios.stubRequest("https://blockfolio-server.herokuapp.com/api/v1/credentials/me", {
+    status: 200,
+    responseText: '1234'
+  });
+
+  moxios.stubRequest('https://api-v0.blockfolio.com/rest/get_all_positions/1234', {
+    status: 200,
+    responseText: data
+  });
+}
+
+const stubAndThrow = () => {
+  moxios.install()
+
+  moxios.stubRequest("https://blockfolio-server.herokuapp.com/api/v1/credentials/me", {
+    status: 200,
+    responseText: '1234'
+  });
+
+  moxios.stubRequest('https://api-v0.blockfolio.com/rest/get_all_positions/1234', {
+    status: 503,
+    responseText: 'dummy'
+  });
+}
+
 describe('All intents', () => {
   let ctx = new Context();
+
+  afterEach(() => {
+    moxios.uninstall()
+  });
 
   describe('Test LaunchIntent', () => {
     describe('with a valid token', function(){
@@ -147,10 +182,10 @@ describe('All intents', () => {
 
       it('valid repromptSpeech', () => {
         expect(ctx.speechResponse.response.reprompt.outputSpeech.ssml)
-        .to.match(/Try asking \"What\'s my balance\?\"/);
+          .to.match(/Try asking \"What\'s my balance\?\"/);
       });
 
-      it('emits the right card', function() {
+      it('emits the right card', () => {
         validCard(ctx, 'Standard', /Welcome.*\nTry asking \"What\'s/);
       });
     });
@@ -186,26 +221,23 @@ describe('All intents', () => {
       event.request.type = 'IntentRequest';
       event.request.intent.name = 'GetCurrentBalanceIntent';
       ctx.done = done;
-
-      // stub GET request
-      sinon
-        .stub(request, 'get')
-        .yields(null, { statusCode: 200 }, JSON.stringify(balances));
-
+      stubAndReturn(balances)
       lambdaToTest.handler(event, ctx);
     });
 
-    after(() => {
-      request.get.restore();
+    it('valid response', (done) => {
+      moxios.wait(() => {
+        validRsp(ctx,{ endSession: true });
+        done()
+      });
     });
 
-    it('valid response', () => {
-      validRsp(ctx,{ endSession: true });
-    });
-
-    it('valid outputSpeech with rounded portfolio value', () => {
-      expect(ctx.speechResponse.response.outputSpeech.ssml)
-        .to.match(/current balance is \$28592\./);
+    it('valid outputSpeech with rounded portfolio value', (done) => {
+      moxios.wait(() => {
+        expect(ctx.speechResponse.response.outputSpeech.ssml)
+          .to.match(/current balance is \$28592\./);
+        done()
+      });
     });
   });
 
@@ -217,26 +249,23 @@ describe('All intents', () => {
         event.request.type = 'IntentRequest';
         event.request.intent.name = 'GetDailyProfitIntent';
         ctx.done = done;
-
-        // stub GET request
-        sinon
-          .stub(request, 'get')
-          .yields(null, { statusCode: 200 }, JSON.stringify(profitableDayData));
-
+        stubAndReturn(profitableDayData)
         lambdaToTest.handler(event, ctx);
       });
 
-      after(() => {
-        request.get.restore();
+      it('valid response', (done) => {
+        moxios.wait(() => {
+          validRsp(ctx,{ endSession: true });
+          done()
+        });
       });
 
-      it('valid response', () => {
-        validRsp(ctx,{ endSession: true });
-      });
-
-      it('valid outputSpeech with rounded profit value', () => {
-        expect(ctx.speechResponse.response.outputSpeech.ssml)
-          .to.match(/Today you made \$9269\./);
+      it('valid outputSpeech with rounded profit value', (done) => {
+        moxios.wait(() => {
+          expect(ctx.speechResponse.response.outputSpeech.ssml)
+            .to.match(/Today you made \$9269\./);
+          done()
+        });
       });
     });
 
@@ -247,51 +276,51 @@ describe('All intents', () => {
         event.request.type = 'IntentRequest';
         event.request.intent.name = 'GetDailyProfitIntent';
         ctx.done = done;
-
-        // stub GET request
-        sinon
-          .stub(request, 'get')
-          .yields(null, { statusCode: 200 }, JSON.stringify(balances));
-
+        stubAndReturn(balances)
         lambdaToTest.handler(event, ctx);
       });
 
-      after(() => {
-        request.get.restore();
+      it('valid response', (done) => {
+        moxios.wait(() => {
+          validRsp(ctx,{ endSession: true });
+          done()
+        });
       });
 
-      it('valid response', () => {
-        validRsp(ctx,{ endSession: true });
-      });
-
-      it('valid outputSpeech with rounded loss value', () => {
-        expect(ctx.speechResponse.response.outputSpeech.ssml)
-          .to.match(/Today you lost \$548\./);
+      it('valid outputSpeech with rounded loss value', (done) => {
+        moxios.wait(() => {
+          expect(ctx.speechResponse.response.outputSpeech.ssml)
+            .to.match(/Today you lost \$548\./);
+          done()
+        });
       });
     });
   });
 
   describe('Blockfolio servers are down', () => {
     before((done) => {
-      ctx.done = done;
-      sinon
-        .stub(request, 'get')
-        .yields('something terrible happened', { statusCode: 500 }, "");
-
-      lambdaToTest.handler(event, ctx);
+      event.request.intent = {};
+      event.session.attributes = {};
+      event.request.type = 'IntentRequest';
+      event.request.intent.name = 'GetDailyProfitIntent';
+      ctx.done = done
+      stubAndThrow()
+      lambdaToTest.handler(event, ctx)
     });
 
-    after(() => {
-      request.get.restore();
+    it('valid response', (done) => {
+      moxios.wait(() => {
+        validRsp(ctx,{ endSession: true });
+        done()
+      });
     });
 
-    it('valid response', () => {
-      validRsp(ctx,{ endSession: true });
-    });
-
-    it('valid outputSpeech', () => {
-      expect(ctx.speechResponse.response.outputSpeech.ssml)
-        .to.match(/currently down/);
+    it('valid outputSpeech', (done) => {
+      moxios.wait(() => {
+        expect(ctx.speechResponse.response.outputSpeech.ssml)
+          .to.match(/currently down/);
+        done()
+      });
     });
   });
 });

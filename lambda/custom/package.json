@@ -2,17 +2,22 @@
   "name": "blockfolio-skill",
   "version": "1.0.0",
   "description": "Blockfolio skill",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janklimo/blockfolio_lambda.git"
+  },
+  "license": "MIT",
   "scripts": {
     "test": "mocha test.js"
   },
   "dependencies": {
     "alexa-sdk": "^1.0.0",
-    "asyncawait": "^1.0.6",
-    "request": "^2.83.0"
+    "axios": "^0.18.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "mocha": "^4.1.0",
+    "moxios": "^0.4.0",
     "sinon": "^4.1.5"
   }
 }
