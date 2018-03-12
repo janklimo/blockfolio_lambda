@@ -102,12 +102,8 @@ const validRsp = (ctx, options) => {
   }
 }
 
-const validCard = (ctx, type, pattern) => {
+const validCard = (ctx, type, title, pattern) => {
   expect(ctx.speechResponse.response.card).not.to.be.undefined;
-
-  afterEach(() => {
-    moxios.uninstall()
-  });
 
   if (type === 'Standard') {
     expect(ctx.speechResponse.response.card.title).not.to.be.undefined;
@@ -119,6 +115,7 @@ const validCard = (ctx, type, pattern) => {
     expect(ctx.speechResponse.response.card.image.largeImageUrl).to
       .equal('https://s3-us-west-2.amazonaws.com/blockfolio/bf_512.png')
     expect(ctx.speechResponse.response.card.text).to.match(pattern);
+    expect(ctx.speechResponse.response.card.title).to.eq(title);
   } else if (type === 'Simple') {
     expect(ctx.speechResponse.response.card.title).not.to.be.undefined;
     expect(ctx.speechResponse.response.card.type).to.be.equal('Simple');
@@ -144,6 +141,31 @@ const stubAndReturn = (data, status) => {
   });
 }
 
+const validateAccountIsLinked = (ctx, intent) => {
+  describe('when the account is not linked', function(){
+    before((done) => {
+      eventWithoutToken.request.type = intent;
+      eventWithoutToken.request.intent = {};
+      eventWithoutToken.session.attributes = {};
+      ctx.done = done;
+      lambdaToTest.handler(eventWithoutToken, ctx);
+    });
+
+    it('valid response', () => {
+      validRsp(ctx,{ endSession: true });
+    });
+
+    it('valid outputSpeech', () => {
+      expect(ctx.speechResponse.response.outputSpeech.ssml).to
+      .match(/Please link.*I\'ve sent/);
+    });
+
+    it('prompts the user with a LinkAccount card', function() {
+      validCard(ctx, 'LinkAccount');
+    });
+  });
+}
+
 describe('All intents', () => {
   let ctx = new Context();
 
@@ -151,7 +173,9 @@ describe('All intents', () => {
     moxios.uninstall()
   });
 
-  describe('Test LaunchIntent', () => {
+  describe('Test LaunchRequest', () => {
+    validateAccountIsLinked(ctx, 'LaunchRequest')
+
     describe('with a valid token', function(){
       before((done) => {
         event.request.type = 'LaunchRequest';
@@ -175,95 +199,20 @@ describe('All intents', () => {
       });
 
       it('emits the right card', () => {
-        validCard(ctx, 'Standard', /Welcome.*\nTry asking \"What\'s/);
-      });
-    });
-
-    describe('when the account is not linked', function(){
-      before((done) => {
-        eventWithoutToken.request.type = 'LaunchRequest';
-        eventWithoutToken.request.intent = {};
-        eventWithoutToken.session.attributes = {};
-        ctx.done = done;
-        lambdaToTest.handler(eventWithoutToken, ctx);
-      });
-
-      it('valid response', () => {
-        validRsp(ctx,{ endSession: true });
-      });
-
-      it('valid outputSpeech', () => {
-        expect(ctx.speechResponse.response.outputSpeech.ssml).to
-          .match(/Please link.*I\'ve sent/);
-      });
-
-      it('prompts the user with a LinkAccount card', function() {
-        validCard(ctx, 'LinkAccount');
+        validCard(ctx, 'Standard', 'Welcome', /Welcome.*\nTry asking \"What\'s/);
       });
     });
   });
 
   describe('Test GetCurrentBalanceIntent', () => {
-    before((done) => {
-      event.request.intent = {};
-      event.session.attributes = {};
-      event.request.type = 'IntentRequest';
-      event.request.intent.name = 'GetCurrentBalanceIntent';
-      ctx.done = done;
-      stubAndReturn(balances, 200)
-      lambdaToTest.handler(event, ctx);
-    });
+    validateAccountIsLinked(ctx, 'GetCurrentBalanceIntent')
 
-    it('valid response', (done) => {
-      moxios.wait(() => {
-        validRsp(ctx,{ endSession: true });
-        done()
-      });
-    });
-
-    it('valid outputSpeech with rounded portfolio value', (done) => {
-      moxios.wait(() => {
-        expect(ctx.speechResponse.response.outputSpeech.ssml)
-          .to.match(/current balance is \$28592\./);
-        done()
-      });
-    });
-  });
-
-  describe('Test GetDailyProfitIntent', () => {
-    describe('Profitable day', () => {
+    describe('with a valid token', function(){
       before((done) => {
         event.request.intent = {};
         event.session.attributes = {};
         event.request.type = 'IntentRequest';
-        event.request.intent.name = 'GetDailyProfitIntent';
-        ctx.done = done;
-        stubAndReturn(profitableDayData, 200)
-        lambdaToTest.handler(event, ctx);
-      });
-
-      it('valid response', (done) => {
-        moxios.wait(() => {
-          validRsp(ctx,{ endSession: true });
-          done()
-        });
-      });
-
-      it('valid outputSpeech with rounded profit value', (done) => {
-        moxios.wait(() => {
-          expect(ctx.speechResponse.response.outputSpeech.ssml)
-            .to.match(/Today you made \$9269\./);
-          done()
-        });
-      });
-    });
-
-    describe('A bad day', () => {
-      before((done) => {
-        event.request.intent = {};
-        event.session.attributes = {};
-        event.request.type = 'IntentRequest';
-        event.request.intent.name = 'GetDailyProfitIntent';
+        event.request.intent.name = 'GetCurrentBalanceIntent';
         ctx.done = done;
         stubAndReturn(balances, 200)
         lambdaToTest.handler(event, ctx);
@@ -276,11 +225,85 @@ describe('All intents', () => {
         });
       });
 
-      it('valid outputSpeech with rounded loss value', (done) => {
+      it('valid outputSpeech with rounded portfolio value', (done) => {
         moxios.wait(() => {
           expect(ctx.speechResponse.response.outputSpeech.ssml)
-            .to.match(/Today you lost \$548\./);
+            .to.match(/current balance is \$28592\./);
           done()
+        });
+      });
+
+      it('emits the right card', () => {
+        validCard(ctx, 'Standard', 'Your current balance',
+                  /current balance is \$28592\./);
+      });
+    });
+  });
+
+  describe('Test GetDailyProfitIntent', () => {
+    validateAccountIsLinked(ctx, 'GetDailyProfitIntent')
+
+    describe('with a valid token', function(){
+      describe('Profitable day', () => {
+        before((done) => {
+          event.request.intent = {};
+          event.session.attributes = {};
+          event.request.type = 'IntentRequest';
+          event.request.intent.name = 'GetDailyProfitIntent';
+          ctx.done = done;
+          stubAndReturn(profitableDayData, 200)
+          lambdaToTest.handler(event, ctx);
+        });
+
+        it('valid response', (done) => {
+          moxios.wait(() => {
+            validRsp(ctx,{ endSession: true });
+            done()
+          });
+        });
+
+        it('valid outputSpeech with rounded profit value', (done) => {
+          moxios.wait(() => {
+            expect(ctx.speechResponse.response.outputSpeech.ssml)
+              .to.match(/Today you made \$9269\./);
+            done()
+          });
+        });
+
+        it('emits the right card', () => {
+          validCard(ctx, 'Standard', 'Your daily profit',
+                    /Today you made \$9269\./);
+        });
+      });
+
+      describe('A bad day', () => {
+        before((done) => {
+          event.request.intent = {};
+          event.session.attributes = {};
+          event.request.type = 'IntentRequest';
+          event.request.intent.name = 'GetDailyProfitIntent';
+          ctx.done = done;
+          stubAndReturn(balances, 200)
+          lambdaToTest.handler(event, ctx);
+        });
+
+        it('valid response', (done) => {
+          moxios.wait(() => {
+            validRsp(ctx,{ endSession: true });
+            done()
+          });
+        });
+
+        it('valid outputSpeech with rounded loss value', (done) => {
+          moxios.wait(() => {
+            expect(ctx.speechResponse.response.outputSpeech.ssml)
+              .to.match(/Today you lost \$548\./);
+            done()
+          });
+        });
+
+        it('emits the right card', () => {
+          validCard(ctx, 'Standard', 'Your daily profit', /Today you lost \$548\./);
         });
       });
     });

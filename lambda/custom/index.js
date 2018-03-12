@@ -46,8 +46,8 @@ var handlers = {
 
     API.getBalance(bearerToken).then(balance => {
       speechOutput = `Your current balance is $${balance}.`;
-      this.response.speak(speechOutput);
-      this.emit(':responseReady');
+      this.emit(':tellWithCard', speechOutput, 'Your current balance',
+                speechOutput, imageObject);
     }).catch(err => {
       handleServersDown(this);
     })
@@ -69,8 +69,8 @@ var handlers = {
         speechOutput = `Today you lost $${Math.abs(profit)}.`;
       }
 
-      this.response.speak(speechOutput);
-      this.emit(':responseReady');
+      this.emit(':tellWithCard', speechOutput, 'Your daily profit',
+                speechOutput, imageObject);
     }).catch(err => {
       handleServersDown(this);
     })
