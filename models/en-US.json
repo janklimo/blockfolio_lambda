@@ -1,7 +1,7 @@
 {
   "interactionModel":{
     "languageModel":{
-      "invocationName":"blockfolio",
+      "invocationName":"blockfolio checker",
       "types":[],
       "intents":[
         {
@@ -42,6 +42,7 @@
             "how much did I make today",
             "how much did I lose today",
             "how much I lost today",
+            "how much I made today",
             "how much profit I made today",
             "what's my today's profit",
             "what is my today's profit",

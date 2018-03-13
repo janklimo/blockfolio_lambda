@@ -5,12 +5,12 @@ const API = require('./api.js');
 
 const APP_ID = "amzn1.ask.skill.e32de1a7-6c49-4842-a156-fec4a1415bc8";
 
-const WELCOME_MESSAGE = 'Welcome to Blockfolio! Ask me about your crypto balances.';
+const WELCOME_MESSAGE = 'Welcome to Blockfolio checker! Ask me about your crypto balances.';
 const WELCOME_REPROMPT = "Try asking \"What\'s my balance?\" or \"How much did I make today?\".";
 const HELP_MESSAGE = "You can try asking \"What\'s my balance\", or you can say exit... What can I help you with?";
 const HELP_REPROMPT = 'What can I help you with?';
 const STOP_MESSAGE = 'Goodbye!';
-const LINKING_PROMPT = 'Welcome to Blockfolio! Please link your account ' +
+const LINKING_PROMPT = 'Welcome to Blockfolio checker! Please link your account ' +
   'to use this Skill. I\'ve sent the details to your Alexa App.'
 
 exports.handler = function(event, context, callback) {
@@ -93,7 +93,7 @@ var handlers = {
 
   'Unhandled' : function() {
     this.response.speak("Sorry, I didn't get that. You can try: " +
-                        "'Alexa, ask Blockfolio what's my current balance'");
+                        "'Alexa, ask Blockfolio checker what's my current balance'");
   }
 };
 

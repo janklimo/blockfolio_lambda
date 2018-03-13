@@ -5,8 +5,8 @@
         "en-US": {
           "summary": "Blockfolio skill for Alexa",
           "examplePhrases": [
-            "Alexa ask Blockfolio how much I made today",
-            "Alexa ask Blockfolio what's my current balance"
+            "Alexa, ask Blockfolio checker how much I made today",
+            "Alexa, ask Blockfolio checker what's my current balance"
           ],
           "keywords": [
             "Blockfolio",
@@ -14,7 +14,7 @@
             "Crypto",
             "Cryptocurrencies"
           ],
-          "name": "Blockfolio",
+          "name": "Blockfolio Checker",
           "description": "Ask Blockfolio about your current balances",
           "smallIconUri": "https://s3-us-west-2.amazonaws.com/blockfolio/bf_108.png",
           "largeIconUri": "https://s3-us-west-2.amazonaws.com/blockfolio/bf_512.png"
