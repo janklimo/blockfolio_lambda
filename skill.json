@@ -3,7 +3,6 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Blockfolio skill for Alexa",
           "examplePhrases": [
             "Alexa, ask Blockfolio checker how much I made today",
             "Alexa, ask Blockfolio checker what's my current balance"
@@ -11,17 +10,19 @@
           "keywords": [
             "Blockfolio",
             "Bitcoin",
+            "Ethereum",
             "Crypto",
             "Cryptocurrencies"
           ],
           "name": "Blockfolio Checker",
-          "description": "Ask Blockfolio about your current balances",
+          "summary": "Blockfolio checker skill for Alexa",
+          "description": "Ask Blockfolio checker about your current balances. Easily check your current balance and daily profit.\n\nTo start, just say \"Alexa, open Blockfolio checker\".\n\nTo check your current balance, say \"Alexa, ask Blockfolio checker what's my current balance\".\n\nIf you'd like to know how much money you made that day, say \"Alexa, ask Blockfolio checker how much I made today\".\n\nAt anytime, you can stop by saying \"Alexa, stop\"",
           "smallIconUri": "https://s3-us-west-2.amazonaws.com/blockfolio/bf_108.png",
           "largeIconUri": "https://s3-us-west-2.amazonaws.com/blockfolio/bf_512.png"
         }
       },
       "isAvailableWorldwide": true,
-      "testingInstructions": "1) Say 'Alexa, open Blockfolio'",
+      "testingInstructions": "1) You'll need to link your account to use the skill. You can download the Blockfolio app and use your token (as shown on the account linking page), or you can use my testing token d37dc4a30bb12b95785d247c0dd25c4c0d5505c773a7ccf2342b30bbf5710e45.\n\n2) Use one of the example phrases to test the functionality.",
       "category": "EDUCATION_AND_REFERENCE",
       "distributionCountries": []
     },
